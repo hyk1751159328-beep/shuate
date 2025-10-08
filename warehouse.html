@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>仓库图片浏览</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    .img-btn { cursor: pointer; border: 2px solid #ccc; margin: 20px; border-radius: 5px; transition: box-shadow 0.2s; }
+    .img-btn:hover { box-shadow: 0 0 10px #888; }
+    .back { margin: 20px; padding: 5px 20px; }
+    .shelf-list, .layer-list { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+    .layer-label { margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+  // 配置图片路径
+  const imgBase = "images/";
+  const gateImg = imgBase + "gate.jpg"; // 仓库大门图片
+  // 五列货架开头图片
+  const shelfImgs = [
+    imgBase + "shelf1.jpg",
+    imgBase + "shelf2.jpg",
+    imgBase + "shelf3.jpg",
+    imgBase + "shelf4.jpg",
+    imgBase + "shelf5.jpg"
+  ];
+  // 每列每层图片：images/shelf{列号}_layer{层号}.jpg
+  function getLayerImg(shelf, layer) {
+    return `${imgBase}shelf${shelf}_layer${layer}.jpg`;
+  }
+
+  // 页面状态
+  let page = "gate"; // gate, shelves, layers
+  let currentShelf = 1;
+
+  function showGate() {
+    document.getElementById("app").innerHTML = `
+      <h2>仓库大门</h2>
+      <img src="${gateImg}" alt="仓库大门" class="img-btn" width="400"
+        onclick="showShelves()" />
+      <div>点击图片进入仓库</div>
+    `;
+    page = "gate";
+  }
+
+  function showShelves() {
+    page = "shelves";
+    let shelfHtml = shelfImgs.map((img, idx) => `
+      <div>
+        <img src="${img}" alt="货架${idx+1}" class="img-btn" width="200"
+         onclick="showLayers(${idx+1})" />
+        <div>第${idx+1}列货架</div>
+      </div>
+    `).join("");
+    document.getElementById("app").innerHTML = `
+      <h2>选择列货架</h2>
+      <div class="shelf-list">${shelfHtml}</div>
+      <button class="back" onclick="showGate()">返回大门</button>
+    `;
+  }
+
+  function showLayers(shelf) {
+    page = "layers";
+    currentShelf = shelf;
+    let layerHtml = "";
+    for (let i=1; i<=4; i++) {
+      layerHtml += `<div>
+        <img src="${getLayerImg(shelf,i)}" alt="第${i}层" class="img-btn" width="180" />
+        <div class="layer-label">第${i}层</div>
+      </div>`;
+    }
+    document.getElementById("app").innerHTML = `
+      <h2>第${shelf}列货架 - 选择层</h2>
+      <div class="layer-list">${layerHtml}</div>
+      <button class="back" onclick="showShelves()">返回列选择</button>
+    `;
+  }
+
+  // 初始化页面
+  showGate();
+  // 让 onclick 事件在局部生效
+  window.showGate = showGate;
+  window.showShelves = showShelves;
+  window.showLayers = showLayers;
+</script>
+</body>
+</html>
